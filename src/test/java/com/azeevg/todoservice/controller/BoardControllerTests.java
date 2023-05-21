@@ -1,6 +1,5 @@
-package com.azeevg.todoservice;
+package com.azeevg.todoservice.controller;
 
-import com.azeevg.todoservice.controller.BoardController;
 import com.azeevg.todoservice.dto.*;
 import com.azeevg.todoservice.model.Board;
 import com.azeevg.todoservice.model.Task;
@@ -9,15 +8,18 @@ import com.azeevg.todoservice.repository.TaskRepository;
 import com.azeevg.todoservice.service.CentralisedUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
@@ -42,7 +44,11 @@ public class BoardControllerTests {
 
 	@MockBean
 	private CentralisedUserService userService;
+	@MockBean
+	private RestTemplate restTemplate;
 
+	@Autowired
+	CacheManager cacheManager;
 	private Board existingBoard1;
 	private Board existingBoard2;
 	private BoardDto existingBoardOutputDto1;
@@ -64,6 +70,7 @@ public class BoardControllerTests {
 	private Task task2;
 
 	private TaskDto outputTaskDto1;
+
 
 	@BeforeEach
 	public void init() {
@@ -118,14 +125,8 @@ public class BoardControllerTests {
 		inputTaskDto1.setId(null);
 		outputTaskDto1 = TaskMapper.toDto(task1);
 
-		userInfo1 = UserInfoDto.builder()
-				.id(userId1.toString())
-				.name(new UserInfoDto.Name("Alex", "Browse"))
-				.location(new UserInfoDto.Location("Berlin", "Germany", "10717")).build();
-		userInfo2 = UserInfoDto.builder()
-				.id(userId2.toString())
-				.name(new UserInfoDto.Name("Patrick", "Wise"))
-				.location(new UserInfoDto.Location("London", "UK", "123AF")).build();
+		userInfo1 = new UserInfoDto(new UserInfoDto.Name("Alex", "Browse"), new UserInfoDto.Location("Berlin", "Germany", "10717"));
+		userInfo2 = new UserInfoDto(new UserInfoDto.Name("Patrick", "Wise"), new UserInfoDto.Location("London", "UK", "123AF"));
 	}
 
 	@Test
@@ -254,6 +255,16 @@ public class BoardControllerTests {
 						.contentType(MediaType.APPLICATION_JSON)
 						.content(asJsonString(inputTaskDto1)))
 				.andExpect(status().isNotFound());
+	}
+
+
+	private UserInfoDto checkCache(UUID uuid) {
+		return (UserInfoDto) cacheManager.getCache("userInfos").get(uuid);
+	}
+
+	@Test
+	public void testCache() {
+		Assertions.assertEquals(userInfo1, checkCache(userId1));
 	}
 
 	private static String asJsonString(Object object) throws JsonProcessingException {

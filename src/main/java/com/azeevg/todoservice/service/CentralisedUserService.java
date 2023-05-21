@@ -16,16 +16,21 @@ import java.util.UUID;
 public class CentralisedUserService {
 
     @Autowired
-    private final RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
     public CentralisedUserService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public void setRestTemplate(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
     @Cacheable("userInfos")
     public UserInfoDto getUser(UUID userId) {
         String apiUrl = "https://randomuser.me/api/?seed=" + userId;
-        CusResponse response = restTemplate.getForObject(apiUrl, CusResponse.class, String.class);
+
+        CusResponse response = restTemplate.getForObject(apiUrl, CusResponse.class);
         return Optional.ofNullable(response)
                 .map(CusResponse::getResults)
                 .map(list -> list.isEmpty() ? null : list.get(0))
