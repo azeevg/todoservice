@@ -39,9 +39,9 @@ public class BoardController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Board>> getAllBoards() {
-        List<Board> boardList = boards.findAll();
-        return ResponseEntity.ok(boardList);
+    public ResponseEntity<List<BoardDto>> getAllBoards() {
+        List<BoardDto> boardsDtoList = boards.findAll().stream().map(BoardMapper::toDto).collect(Collectors.toList());
+        return ResponseEntity.ok(boardsDtoList);
     }
 
     @PostMapping

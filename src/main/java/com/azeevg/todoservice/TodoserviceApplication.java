@@ -9,8 +9,6 @@ import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
-
 @EnableCaching
 @SpringBootApplication
 public class TodoserviceApplication {
