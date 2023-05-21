@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/boards")
+@RequestMapping("/webhooks")
 public class WebhooksController {
 
     @Autowired
@@ -24,12 +24,7 @@ public class WebhooksController {
     @Autowired
     private CacheManager cacheManager;
 
-    public WebhooksController(TaskRepository tasks, CacheManager cacheManager) {
-        this.tasks = tasks;
-        this.cacheManager = cacheManager;
-    }
-
-    @PostMapping("/webhooks/user-deleted")
+    @PostMapping("/user-deleted")
     public ResponseEntity<Void> handleUserDeletedWebhook(@RequestBody UserDeletedPayload payload) {
         UUID userId = payload.getData().getUser();
         cacheManager.getCache("userInfos").evict(userId);

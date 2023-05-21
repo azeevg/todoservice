@@ -2,15 +2,16 @@ package com.azeevg.todoservice.dto;
 
 import com.azeevg.todoservice.model.Task;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class TaskMapper {
     public static TaskDto toDto(Task task) {
         TaskDto taskDto = new TaskDto();
-        taskDto.setId(task.getId().toString());
+        taskDto.setId(Optional.ofNullable(task.getId()).map(UUID::toString).orElse(null));
         taskDto.setName(task.getName());
         taskDto.setDescription(task.getDescription());
-        taskDto.setUser(task.getUser().toString());
+        taskDto.setUser(Optional.ofNullable(task.getUser()).map(UUID::toString).orElse(null));
         taskDto.setStatus(task.getStatus().toString());
 
         return taskDto;
@@ -20,7 +21,7 @@ public class TaskMapper {
         Task task = new Task();
         task.setName(taskDto.getName());
         task.setDescription(taskDto.getDescription());
-        task.setUser(UUID.fromString(taskDto.getUser()));
+        task.setUser(Optional.ofNullable(taskDto.getUser()).map(UUID::fromString).orElse(null));
         return task;
     }
 }

@@ -11,17 +11,16 @@ import com.azeevg.todoservice.validation.TaskCreation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/boards")
-@Validated
 public class BoardController {
     @Autowired
     private BoardRepository boards;
@@ -31,12 +30,6 @@ public class BoardController {
 
     @Autowired
     private CentralisedUserService userService;
-
-    public BoardController(BoardRepository boards, TaskRepository tasks, CentralisedUserService userService) {
-        this.boards = boards;
-        this.tasks = tasks;
-        this.userService = userService;
-    }
 
     @GetMapping
     public ResponseEntity<List<BoardDto>> getAllBoards() {
@@ -55,39 +48,37 @@ public class BoardController {
     @GetMapping("/{id}")
     public ResponseEntity<BoardDto> getBoard(@PathVariable UUID id) {
         Optional<Board> optionalBoard = boards.findById(id);
-        if (optionalBoard.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
+        if (optionalBoard.isPresent()) {
             Board board = optionalBoard.get();
             BoardDto boardDto = BoardMapper.toDto(board);
             List<TaskDto> tasks = board.getTasks().stream().parallel().map(this::toDtoWithUserInfo).collect(Collectors.toList());
             boardDto.setTasks(tasks);
             return ResponseEntity.ok(boardDto);
         }
+        return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBoard(@PathVariable UUID id) {
         Optional<Board> optionalBoard = boards.findById(id);
-        if (optionalBoard.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        if (optionalBoard.isPresent()) {
+            boards.deleteById(id);
+            return ResponseEntity.noContent().build();
         }
-        boards.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/{id}/tasks")
     public ResponseEntity<TaskDto> createTask(@PathVariable UUID id, @RequestBody @Validated(TaskCreation.class) TaskDto taskDto) {
         Optional<Board> optionalBoard = boards.findById(id);
-        if (optionalBoard.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        } else {
+        if (optionalBoard.isPresent()) {
             Task task = TaskMapper.fromDto(taskDto);
             task.setBoard(optionalBoard.get());
             Task createdTask = tasks.save(task);
             TaskDto createdTaskDto = TaskMapper.toDto(createdTask);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdTaskDto);
         }
+        return ResponseEntity.notFound().build();
     }
 
 
@@ -96,5 +87,17 @@ public class BoardController {
         UserInfoDto user = userService.getUser(task.getUser());
         taskDto.setUserInfo(user);
         return taskDto;
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

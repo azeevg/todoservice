@@ -1,7 +1,7 @@
 package com.azeevg.todoservice.service;
 
-import com.azeevg.todoservice.exception.CentralisedUserServiceException;
 import com.azeevg.todoservice.dto.UserInfoDto;
+import com.azeevg.todoservice.exception.CentralisedUserServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,5 +31,4 @@ public class CentralisedUserService {
                 .map(list -> list.isEmpty() ? null : list.get(0))
                 .orElseThrow(CentralisedUserServiceException::new);
     }
-
 }

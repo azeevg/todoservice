@@ -14,8 +14,8 @@ import org.springframework.web.client.RestTemplate;
 public class TodoserviceApplication {
 
 	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		return builder.build();
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
 	}
 
 	@Bean

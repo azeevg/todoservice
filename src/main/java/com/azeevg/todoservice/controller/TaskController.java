@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.UUID;
-
+@RestController
+@RequestMapping("/tasks")
 public class TaskController {
 
     @Autowired
@@ -23,11 +24,6 @@ public class TaskController {
 
     @Autowired
     private TaskRepository tasks;
-
-    public TaskController(BoardRepository boards, TaskRepository tasks) {
-        this.boards = boards;
-        this.tasks = tasks;
-    }
 
     @PutMapping("/tasks/{id}")
     public ResponseEntity<TaskDto> overwriteTask(@PathVariable UUID id, @RequestBody @Validated(TaskCreation.class) TaskDto taskDto) {
