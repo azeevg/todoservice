@@ -25,7 +25,7 @@ public class TaskController {
     @Autowired
     private TaskRepository tasks;
 
-    @PutMapping("/tasks/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<TaskDto> overwriteTask(@PathVariable UUID id, @RequestBody @Validated(TaskCreation.class) TaskDto taskDto) {
         Optional<Task> optionalTask = tasks.findById(id);
         if (optionalTask.isPresent()) {
@@ -43,7 +43,7 @@ public class TaskController {
     }
 
 
-    @PatchMapping("/tasks/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable UUID id, @RequestBody TaskDto taskDto) {
         Optional<Task> optionalTask = tasks.findById(id);
         if (optionalTask.isPresent()) {
@@ -67,7 +67,7 @@ public class TaskController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/tasks/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
         Optional<Task> optionalTask = tasks.findById(id);
 
