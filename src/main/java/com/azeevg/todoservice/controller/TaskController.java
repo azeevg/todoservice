@@ -8,6 +8,7 @@ import com.azeevg.todoservice.model.TaskStatus;
 import com.azeevg.todoservice.repository.BoardRepository;
 import com.azeevg.todoservice.repository.TaskRepository;
 import com.azeevg.todoservice.validation.TaskCreation;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -45,7 +46,7 @@ public class TaskController {
 
 
     @PatchMapping("/{id}")
-    public ResponseEntity<TaskDto> updateTask(@PathVariable UUID id, @RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskDto> updateTask(@PathVariable UUID id, @Valid @RequestBody TaskDto taskDto) {
         Optional<Task> optionalTask = tasks.findById(id);
         if (optionalTask.isPresent()) {
             Task task = optionalTask.get();

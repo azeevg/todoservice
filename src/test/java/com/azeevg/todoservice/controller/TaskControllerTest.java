@@ -81,6 +81,15 @@ class TaskControllerTest {
     }
 
     @Test
+    public void overwriteTask_badRequest_failedValidation() throws Exception {
+        TaskDto nullableDescriptionTaskDto = createTaskDto(userId.toString(), "Task name", null);
+        mockMvc.perform(put("/tasks/{id}", task.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(nullableDescriptionTaskDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void updateTask_ok() throws Exception {
         given(taskRepository.findById(task.getId())).willReturn(Optional.of(task));
         given(taskRepository.save(any(Task.class))).willReturn(replacementTask);
@@ -104,6 +113,17 @@ class TaskControllerTest {
                         .content(asJsonString(inputTaskDto)))
                 .andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    void updateTask_badRequest_invalidTaskStatus() throws Exception {
+        TaskDto invalidStatusTaskDto = createTaskDto(userId.toString(), "Name", "Desc");
+        invalidStatusTaskDto.setStatus("INVALID_STATUS");
+
+        mockMvc.perform(patch("/tasks/{id}", task.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(invalidStatusTaskDto)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

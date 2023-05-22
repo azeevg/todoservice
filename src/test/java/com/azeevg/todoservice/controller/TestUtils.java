@@ -1,7 +1,7 @@
 package com.azeevg.todoservice.controller;
 
 import com.azeevg.todoservice.dto.BoardDto;
-import com.azeevg.todoservice.dto.UserInfoDto;
+import com.azeevg.todoservice.dto.TaskDto;
 import com.azeevg.todoservice.model.Board;
 import com.azeevg.todoservice.model.Task;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,6 +37,14 @@ public class TestUtils {
         task.setBoard(board);
 
         return task;
+    }
+
+    public static TaskDto createTaskDto(String user, String name, String description) {
+        TaskDto taskDto = new TaskDto();
+        taskDto.setUser(user);
+        taskDto.setName(name);
+        taskDto.setDescription(description);
+        return taskDto;
     }
 
     public static String asJsonString(Object object) throws JsonProcessingException {
