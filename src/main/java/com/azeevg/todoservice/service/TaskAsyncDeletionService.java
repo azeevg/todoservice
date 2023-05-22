@@ -28,7 +28,7 @@ public class TaskAsyncDeletionService {
         if (cache != null) {
             cache.evict(userId);
         }
-        this.tasks.deleteByUser(userId);
+        this.tasks.deleteByUserId(userId);
         return CompletableFuture.completedFuture(null);
     }
 }

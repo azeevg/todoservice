@@ -42,6 +42,6 @@ public class TaskAsyncDeletionServiceTest {
         deletionFuture.join();
 
         verify(userInfoCache).evict(uuid);
-        verify(taskRepository).deleteByUser(uuid);
+        verify(taskRepository).deleteByUserId(uuid);
     }
 }

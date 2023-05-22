@@ -7,6 +7,7 @@ import com.azeevg.todoservice.repository.BoardRepository;
 import com.azeevg.todoservice.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,7 +38,7 @@ public class BoardService {
         if (optionalBoard.isPresent()) {
             Board board = optionalBoard.get();
             board.getTasks().stream().parallel()
-                    .forEach(task -> task.setUserInfo(userService.getUser(task.getUser())));
+                    .forEach(task -> task.setUserInfo(userService.getUser(task.getUserId())));
             return board;
         }
         throw new NotFoundException();
@@ -48,6 +49,7 @@ public class BoardService {
         Optional<Board> optionalBoard = boards.findById(id);
         if (optionalBoard.isPresent()) {
             boards.deleteById(id);
+            return;
         }
         throw new NotFoundException();
     }

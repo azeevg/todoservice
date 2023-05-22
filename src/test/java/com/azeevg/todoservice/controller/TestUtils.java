@@ -33,7 +33,7 @@ public class TestUtils {
         task.setId(uuid);
         task.setName(name);
         task.setDescription(description);
-        task.setUser(userId);
+        task.setUserId(userId);
         task.setBoard(board);
 
         return task;

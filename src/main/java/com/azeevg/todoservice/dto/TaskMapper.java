@@ -11,7 +11,7 @@ public class TaskMapper {
         taskDto.setId(Optional.ofNullable(task.getId()).map(UUID::toString).orElse(null));
         taskDto.setName(task.getName());
         taskDto.setDescription(task.getDescription());
-        taskDto.setUser(Optional.ofNullable(task.getUser()).map(UUID::toString).orElse(null));
+        taskDto.setUser(Optional.ofNullable(task.getUserId()).map(UUID::toString).orElse(null));
         taskDto.setStatus(task.getStatus().toString());
         taskDto.setUserInfo(task.getUserInfo());
         return taskDto;
@@ -21,7 +21,7 @@ public class TaskMapper {
         Task task = new Task();
         task.setName(taskDto.getName());
         task.setDescription(taskDto.getDescription());
-        task.setUser(Optional.ofNullable(taskDto.getUser()).map(UUID::fromString).orElse(null));
+        task.setUserId(Optional.ofNullable(taskDto.getUser()).map(UUID::fromString).orElse(null));
         return task;
     }
 }

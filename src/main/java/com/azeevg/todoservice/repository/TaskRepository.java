@@ -9,5 +9,5 @@ import java.util.UUID;
 @Repository
 public interface TaskRepository extends CrudRepository<Task, UUID> {
 
-    void deleteByUser(UUID userId);
+    void deleteByUserId(UUID userId);
 }

@@ -57,7 +57,7 @@ public class TaskController {
                 task.setDescription(taskDto.getDescription());
             }
             if (taskDto.getUser() != null) {
-                task.setUser(UUID.fromString(taskDto.getUser()));
+                task.setUserId(UUID.fromString(taskDto.getUser()));
             }
             if (taskDto.getStatus() != null) {
                 task.setStatus(TaskStatus.valueOf(taskDto.getStatus()));
