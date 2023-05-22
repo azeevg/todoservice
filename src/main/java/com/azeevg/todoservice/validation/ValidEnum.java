@@ -13,8 +13,11 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = EnumValueValidator.class)
 public @interface ValidEnum {
     Class<? extends Enum<?>> enumClass();
+
     String message() default "must be any of enum {enum}";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 
     boolean nullable() default true;

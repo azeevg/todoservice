@@ -11,6 +11,8 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.azeevg.todoservice.AppConfig.USER_INFO_CACHE_NAME;
+
 @Slf4j
 @Service
 public class CentralisedUserService {
@@ -26,7 +28,7 @@ public class CentralisedUserService {
         this.restTemplate = restTemplate;
     }
 
-    @Cacheable("userInfos")
+    @Cacheable(USER_INFO_CACHE_NAME)
     public UserInfoDto getUser(UUID userId) {
         String apiUrl = "https://randomuser.me/api/?seed=" + userId;
 
