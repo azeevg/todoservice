@@ -2,10 +2,10 @@ package com.azeevg.todoservice.controller;
 
 import com.azeevg.todoservice.dto.TaskDto;
 import com.azeevg.todoservice.dto.TaskMapper;
+import com.azeevg.todoservice.exception.NotFoundException;
 import com.azeevg.todoservice.model.Board;
 import com.azeevg.todoservice.model.Task;
-import com.azeevg.todoservice.repository.BoardRepository;
-import com.azeevg.todoservice.repository.TaskRepository;
+import com.azeevg.todoservice.service.TaskService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -16,14 +16,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.azeevg.todoservice.controller.TestUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,10 +33,7 @@ class TaskControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private BoardRepository boardRepository;
-
-    @MockBean
-    private TaskRepository taskRepository;
+    private TaskService taskService;
 
     private final UUID userId = UUID.randomUUID();
     private final Board board = createBoard(UUID.randomUUID(), "My board", "My board desc");
@@ -56,25 +51,20 @@ class TaskControllerTest {
 
     @Test
     public void overwriteTask_ok() throws Exception {
-        given(taskRepository.findById(task.getId())).willReturn(Optional.of(task));
-        given(taskRepository.save(any(Task.class))).willReturn(replacementTask);
+        given(taskService.overwriteTask(any(), any(Task.class))).willReturn(replacementTask);
 
         mockMvc.perform(put("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(inputTaskDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(asJsonString(outputTaskDto)));
-
-        verify(taskRepository, times(1)).deleteById(task.getId());
-        verify(taskRepository, times(1)).save(any(Task.class));
-
     }
 
     @Test
     public void overwriteTask_notFound() throws Exception {
-        given(taskRepository.findById(task.getId())).willReturn(Optional.empty());
+        given(taskService.overwriteTask(any(), any())).willThrow(NotFoundException.class);
 
-        mockMvc.perform(put("/tasks/{id}", task.getId())
+        mockMvc.perform(put("/tasks/{id}", UUID.randomUUID())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(inputTaskDto)))
                 .andExpect(status().isNotFound());
@@ -91,28 +81,24 @@ class TaskControllerTest {
 
     @Test
     void updateTask_ok() throws Exception {
-        given(taskRepository.findById(task.getId())).willReturn(Optional.of(task));
-        given(taskRepository.save(any(Task.class))).willReturn(replacementTask);
+        given(taskService.updateTask(any(Task.class))).willReturn(replacementTask);
 
         mockMvc.perform(patch("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(inputTaskDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(asJsonString(outputTaskDto)));
-
-        verify(taskRepository, times(1)).save(any(Task.class));
     }
 
 
     @Test
     void updateTask_notFound() throws Exception {
-        given(taskRepository.findById(task.getId())).willReturn(Optional.empty());
+        given(taskService.updateTask(any(Task.class))).willThrow(NotFoundException.class);
 
         mockMvc.perform(patch("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(inputTaskDto)))
                 .andExpect(status().isNotFound());
-
     }
 
     @Test
@@ -128,19 +114,15 @@ class TaskControllerTest {
 
     @Test
     void deleteTask_noContent() throws Exception {
-        given(taskRepository.findById(task.getId())).willReturn(Optional.of(task));
-
         mockMvc.perform(delete("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(inputTaskDto)))
                 .andExpect(status().isNoContent());
-
-        verify(taskRepository, times(1)).deleteById(any(UUID.class));
     }
 
     @Test
     void deleteTask_notFound() throws Exception {
-        given(taskRepository.findById(task.getId())).willReturn(Optional.empty());
+        willThrow(NotFoundException.class).given(taskService).deleteTask(any());
 
         mockMvc.perform(delete("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)

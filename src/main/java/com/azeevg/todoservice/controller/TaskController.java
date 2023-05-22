@@ -2,11 +2,11 @@ package com.azeevg.todoservice.controller;
 
 import com.azeevg.todoservice.dto.TaskDto;
 import com.azeevg.todoservice.dto.TaskMapper;
-import com.azeevg.todoservice.model.Board;
 import com.azeevg.todoservice.model.Task;
 import com.azeevg.todoservice.model.TaskStatus;
 import com.azeevg.todoservice.repository.BoardRepository;
 import com.azeevg.todoservice.repository.TaskRepository;
+import com.azeevg.todoservice.service.TaskService;
 import com.azeevg.todoservice.validation.TaskCreation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -22,62 +21,40 @@ import java.util.UUID;
 public class TaskController {
 
     @Autowired
-    private BoardRepository boards;
+    private TaskService taskService;
 
-    @Autowired
-    private TaskRepository tasks;
 
     @PutMapping("/{id}")
     public ResponseEntity<TaskDto> overwriteTask(@PathVariable UUID id, @RequestBody @Validated(TaskCreation.class) TaskDto taskDto) {
-        Optional<Task> optionalTask = tasks.findById(id);
-        if (optionalTask.isPresent()) {
-            Board board = optionalTask.get().getBoard();
-            tasks.deleteById(id);
-
-            Task task = TaskMapper.fromDto(taskDto);
-            task.setBoard(board);
-            Task savedTask = tasks.save(task);
-
-            TaskDto savedTaskDto = TaskMapper.toDto(savedTask);
-            return ResponseEntity.ok(savedTaskDto);
-        }
-        return ResponseEntity.notFound().build();
+        Task task = TaskMapper.fromDto(taskDto);
+        Task overwrittenTask = taskService.overwriteTask(id, task);
+        return ResponseEntity.ok(TaskMapper.toDto(overwrittenTask));
     }
 
 
     @PatchMapping("/{id}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable UUID id, @Valid @RequestBody TaskDto taskDto) {
-        Optional<Task> optionalTask = tasks.findById(id);
-        if (optionalTask.isPresent()) {
-            Task task = optionalTask.get();
-            if (taskDto.getName() != null) {
-                task.setName(taskDto.getName());
-            }
-            if (taskDto.getDescription() != null) {
-                task.setDescription(taskDto.getDescription());
-            }
-            if (taskDto.getUser() != null) {
-                task.setUserId(UUID.fromString(taskDto.getUser()));
-            }
-            if (taskDto.getStatus() != null) {
-                task.setStatus(TaskStatus.valueOf(taskDto.getStatus()));
-            }
-            Task updatedTask = tasks.save(task);
-            TaskDto updatedTaskDto = TaskMapper.toDto(updatedTask);
-            return ResponseEntity.ok(updatedTaskDto);
+        Task task = new Task();
+        task.setId(id);
+        if (taskDto.getName() != null) {
+            task.setName(taskDto.getName());
         }
-        return ResponseEntity.notFound().build();
+        if (taskDto.getDescription() != null) {
+            task.setDescription(taskDto.getDescription());
+        }
+        if (taskDto.getUser() != null) {
+            task.setUserId(UUID.fromString(taskDto.getUser()));
+        }
+        if (taskDto.getStatus() != null) {
+            task.setStatus(TaskStatus.valueOf(taskDto.getStatus()));
+        }
+        Task updatedTask = taskService.updateTask(task);
+        return ResponseEntity.ok(TaskMapper.toDto(updatedTask));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
-        Optional<Task> optionalTask = tasks.findById(id);
-
-        if (optionalTask.isPresent()) {
-            tasks.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        taskService.deleteTask(id);
+        return ResponseEntity.noContent().build();
     }
-
 }
