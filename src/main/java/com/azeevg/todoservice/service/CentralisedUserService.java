@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.azeevg.todoservice.AppConfig.USER_INFO_CACHE_NAME;
+import static com.azeevg.todoservice.TodoserviceApplication.USER_INFO_CACHE_NAME;
 
 @Slf4j
 @Service

@@ -1,6 +1,6 @@
 package com.azeevg.todoservice.service;
 
-import com.azeevg.todoservice.controller.TestUtils;
+import com.azeevg.todoservice.TestUtils;
 import com.azeevg.todoservice.dto.UserInfoDto;
 import com.azeevg.todoservice.exception.NotFoundException;
 import com.azeevg.todoservice.model.Board;
@@ -10,23 +10,21 @@ import com.azeevg.todoservice.repository.TaskRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.azeevg.todoservice.controller.TestUtils.createTask;
+import static com.azeevg.todoservice.TestUtils.createTask;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
-public class BoardServiceTests {
+@Transactional
+public class BoardServiceTest {
 
     @Autowired
     private BoardRepository boardRepository;
@@ -57,7 +55,6 @@ public class BoardServiceTests {
     );
 
     @BeforeEach
-    @Transactional
     public void setUp() {
         boardRepository.deleteAll();
         taskRepository.deleteAll();
@@ -84,7 +81,6 @@ public class BoardServiceTests {
     }
 
     @Test
-    @Transactional
     public void getAllBoards_returns2Boards() throws Exception {
         List<Board> boards = boardService.getAllBoards();
         Assertions.assertEquals(2, boards.size());
@@ -95,7 +91,6 @@ public class BoardServiceTests {
     }
 
     @Test
-    @Transactional
     public void createBoard_returnsCreatedBoard() throws Exception {
         Board board = TestUtils.createBoard(null, "Board 101", "Created in a test");
         Board newBoard = boardService.createBoard(board);
@@ -104,7 +99,6 @@ public class BoardServiceTests {
     }
 
     @Test
-    @Transactional
     public void getBoardWithTasks_returnsBoardWithTasks() throws Exception {
         Board board = boardService.getBoardWithTasks(existingBoardId2);
 
@@ -117,13 +111,11 @@ public class BoardServiceTests {
     }
 
     @Test
-    @Transactional
     public void getBoardWithTasks_throws_NotFoundException() throws Exception {
         Assertions.assertThrows(NotFoundException.class, () -> boardService.getBoardWithTasks(UUID.randomUUID()));
     }
 
     @Test
-    @Transactional
     public void deleteBoard_deletesBoard() throws Exception {
         boardService.deleteBoard(existingBoardId2);
         Assertions.assertTrue(boardRepository.findById(existingBoardId2).isEmpty(), "Board should have been deleted");
@@ -132,13 +124,11 @@ public class BoardServiceTests {
     }
 
     @Test
-    @Transactional
     public void deleteBoard_throws_NotFoundException() throws Exception {
         Assertions.assertThrows(NotFoundException.class, () -> boardService.deleteBoard(UUID.randomUUID()));
     }
 
     @Test
-    @Transactional
     public void addTask_returnsAddedTask() throws Exception {
         Task task = new Task();
         task.setName("My insane task");
@@ -148,10 +138,13 @@ public class BoardServiceTests {
         Optional<Task> taskToCheck = taskRepository.findById(addedTask.getId());
         Assertions.assertTrue(taskToCheck.isPresent(), "Task should be available in the repository");
         Assertions.assertEquals("My insane task", taskToCheck.get().getName());
+
+        Optional<Board> board = boardRepository.findById(existingBoardId1);
+        Assertions.assertTrue(board.isPresent());
+        Assertions.assertEquals(4, board.get().getTasks().size());
     }
 
     @Test
-    @Transactional
     public void addTask_throws_NotFoundException() throws Exception {
         Task task = new Task();
         task.setName("My insane task");

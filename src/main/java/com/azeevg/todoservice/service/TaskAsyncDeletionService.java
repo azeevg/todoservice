@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-import static com.azeevg.todoservice.AppConfig.USER_INFO_CACHE_NAME;
+import static com.azeevg.todoservice.TodoserviceApplication.USER_INFO_CACHE_NAME;
 
 @Service
 @Slf4j

@@ -6,11 +6,11 @@ import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "task")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "task_id")
+    @Column(unique = true)
     private UUID id;
     private String name;
     private String description;
@@ -19,7 +19,7 @@ public class Task {
     private UUID userId;
     private TaskStatus status = TaskStatus.CREATED;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 

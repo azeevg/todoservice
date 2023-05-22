@@ -35,7 +35,6 @@ public class TaskController {
     @PatchMapping("/{id}")
     public ResponseEntity<TaskDto> updateTask(@PathVariable UUID id, @Valid @RequestBody TaskDto taskDto) {
         Task task = new Task();
-        task.setId(id);
         if (taskDto.getName() != null) {
             task.setName(taskDto.getName());
         }
@@ -48,7 +47,7 @@ public class TaskController {
         if (taskDto.getStatus() != null) {
             task.setStatus(TaskStatus.valueOf(taskDto.getStatus()));
         }
-        Task updatedTask = taskService.updateTask(task);
+        Task updatedTask = taskService.updateTask(id, task);
         return ResponseEntity.ok(TaskMapper.toDto(updatedTask));
     }
 

@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static com.azeevg.todoservice.controller.TestUtils.*;
+import static com.azeevg.todoservice.TestUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
@@ -81,7 +81,7 @@ class TaskControllerTest {
 
     @Test
     void updateTask_ok() throws Exception {
-        given(taskService.updateTask(any(Task.class))).willReturn(replacementTask);
+        given(taskService.updateTask(any(), any(Task.class))).willReturn(replacementTask);
 
         mockMvc.perform(patch("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +93,7 @@ class TaskControllerTest {
 
     @Test
     void updateTask_notFound() throws Exception {
-        given(taskService.updateTask(any(Task.class))).willThrow(NotFoundException.class);
+        given(taskService.updateTask(any(), any(Task.class))).willThrow(NotFoundException.class);
 
         mockMvc.perform(patch("/tasks/{id}", task.getId())
                         .contentType(MediaType.APPLICATION_JSON)

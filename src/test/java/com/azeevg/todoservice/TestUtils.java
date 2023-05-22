@@ -1,4 +1,4 @@
-package com.azeevg.todoservice.controller;
+package com.azeevg.todoservice;
 
 import com.azeevg.todoservice.dto.BoardDto;
 import com.azeevg.todoservice.dto.TaskDto;
@@ -35,6 +35,15 @@ public class TestUtils {
         task.setDescription(description);
         task.setUserId(userId);
         task.setBoard(board);
+
+        return task;
+    }
+
+    public static Task createTask(String name, String description, UUID userId) {
+        Task task = new Task();
+        task.setName(name);
+        task.setDescription(description);
+        task.setUserId(userId);
 
         return task;
     }

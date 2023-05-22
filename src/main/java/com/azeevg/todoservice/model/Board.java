@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "boards")
+@Table(name = "board")
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "board_id")
+    @Column(unique = true)
     private UUID id;
     @NotBlank
     private String name;
     private String description;
-    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Task> tasks = new ArrayList<>();
 
     public Board() {
