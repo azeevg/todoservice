@@ -13,7 +13,7 @@ public class TaskMapper {
         taskDto.setDescription(task.getDescription());
         taskDto.setUser(Optional.ofNullable(task.getUser()).map(UUID::toString).orElse(null));
         taskDto.setStatus(task.getStatus().toString());
-
+        taskDto.setUserInfo(task.getUserInfo());
         return taskDto;
     }
 

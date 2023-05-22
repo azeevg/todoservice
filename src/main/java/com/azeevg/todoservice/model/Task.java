@@ -1,5 +1,6 @@
 package com.azeevg.todoservice.model;
 
+import com.azeevg.todoservice.dto.UserInfoDto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -23,4 +24,6 @@ public class Task {
     @JsonIgnore
     private Board board;
 
+    @Transient
+    private UserInfoDto userInfo;
 }

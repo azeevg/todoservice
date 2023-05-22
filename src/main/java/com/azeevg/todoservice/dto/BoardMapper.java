@@ -4,6 +4,7 @@ import com.azeevg.todoservice.model.Board;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class BoardMapper {
     public static Board fromDto(BoardDto boardDto) {
@@ -21,6 +22,12 @@ public class BoardMapper {
         boardDto.setName(board.getName());
         boardDto.setDescription(board.getDescription());
 
+        return boardDto;
+    }
+
+    public static BoardDto toDtoWithTasks(Board board) {
+        BoardDto boardDto = toDto(board);
+        boardDto.setTasks(board.getTasks().stream().map(TaskMapper::toDto).collect(Collectors.toList()));
         return boardDto;
     }
 }
