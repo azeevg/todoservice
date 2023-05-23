@@ -4,8 +4,6 @@ import com.azeevg.todoservice.dto.TaskDto;
 import com.azeevg.todoservice.dto.TaskMapper;
 import com.azeevg.todoservice.model.Task;
 import com.azeevg.todoservice.model.TaskStatus;
-import com.azeevg.todoservice.repository.BoardRepository;
-import com.azeevg.todoservice.repository.TaskRepository;
 import com.azeevg.todoservice.service.TaskService;
 import com.azeevg.todoservice.validation.TaskCreation;
 import jakarta.validation.Valid;
